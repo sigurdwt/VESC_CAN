@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vesc-can"
+version = "0.1.0"
+description = "Python-driver for VESC via CAN"
+authors = [{ name="Sigurd Werner-Torgersen", email="sigurd.w.torgersen@wheel.me" }]
+license = {text = "MIT"}
+dependencies = [
+    "python-can"
+]
