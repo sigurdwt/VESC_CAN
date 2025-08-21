@@ -1,13 +1,20 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "vesc-can"
-version = "0.1.0"
+version = "0.1.1"  # <- bump versjon for å tvinge reinstall
 description = "Python-driver for VESC via CAN"
-authors = [{ name="Sigurd Werner-Torgersen", email="sigurd.w.torgersen@wheel.me" }]
+readme = "README.md"
+requires-python = ">=3.8"
 license = {text = "MIT"}
-dependencies = [
-    "python-can"
-]
+authors = [{ name = "Sigurd Werner-Torgersen", email = "sigurd.w.torgersen@wheel.me" }]
+dependencies = ["python-can"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}  # <- viktig: peker på src
+
+[tool.setuptools.packages.find]
+where = ["src"]              # <- viktig: finn pakker i src
+include = ["vesc_can*"]
