@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vesc-can"
-version = "0.1.3"
+version = "0.1.4"
 description = "Python-driver for VESC via CAN"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -14,4 +14,4 @@ dependencies = ["python-can"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-packages = ["vesc_can"]           # <- nøkkelen! ikke 'find', men eksplisitt liste
+packages = ["vesc_can"] 

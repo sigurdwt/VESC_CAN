@@ -1,17 +1,26 @@
-# vesc_utils.py
+# py
 
 import struct
 import can
 import time
 
 
+COMM_SET_DUTY = 0x00
+COMM_SET_CURRENT = 0x01
+COMM_SET_BRAKE = 0x02
+COMM_SET_RPM = 0x03
+COMM_PING = 0x11
+
+COMM_STATUS_1 =  0x09
+COMM_STATUS_2 =  0x0E
+COMM_STATUS_3 =  0x0F
+COMM_STATUS_4 =  0x10
+COMM_STATUS_5 =  0x1B
+
+
 class VESC:
     # Kommando-koder (fra VESC firmware)
-    COMM_SET_DUTY = 0x00
-    COMM_SET_CURRENT = 0x01
-    COMM_SET_BRAKE = 0x02
-    COMM_SET_RPM = 0x03
-    COMM_PING = 0x11
+
 
 
     def __init__(self, vesc_id: int, bus: can.Bus):
@@ -100,6 +109,18 @@ def parse_status(data):
     duty = struct.unpack_from(">h", data, 6)[0] / 1000.0
     return rpm, current, duty
 
+def parse_status_2(data):
+    # Int32 @0: amp-hours (forbruk), Int32 @4: amp-hours charged (regen)
+    ah = struct.unpack_from(">i", data, 0)[0] / 10000.0
+    ah_ch = struct.unpack_from(">i", data, 4)[0] / 10000.0
+    return ah, ah_ch
+
+def parse_status_3(data):
+    # Int32 @0: watt-hours (forbruk), Int32 @4: watt-hours charged (regen)
+    wh = struct.unpack_from(">i", data, 0)[0] / 10000.0
+    wh_ch = struct.unpack_from(">i", data, 4)[0] / 10000.0
+    return wh, wh_ch
+
 def parse_status_4(data):
     mos_temp = struct.unpack_from(">h", data, 0)[0] / 10.0
     motor_temp = struct.unpack_from(">h", data, 2)[0] / 10.0
@@ -116,3 +137,64 @@ def extract_command_and_id(arb_id):
     vesc_id = arb_id & 0xFF
     cmd = (arb_id >> 8) & 0xFF
     return cmd, vesc_id
+
+
+#Make a function thtat takes in a can msg and returns the correct data
+def parse_vesc_status(msg): 
+    vesc_data = {
+        vesc_id: {
+            'time': None,
+            'current': 0.0,
+            'rpm': 0,
+            'duty': 0.0,
+            'mos_temp': 0.0,
+            'motor_temp': 0.0,
+            'input_current': 0.0,
+            'pid_pos': 0.0,
+            'tachometer': 0,
+            'voltage': 0.0,
+            'amp_hours': 0.0,
+            'amp_hours_charged': 0.0,
+            'watt_hours': 0.0,
+            'watt_hours_charged': 0.0,
+        }
+    }
+
+    cmd, vesc_id = extract_command_and_id(msg.arbitration_id)
+    vesc_data[vesc_id]['time'] = time.time()
+
+    if cmd == COMM_STATUS_1:  # STATUS
+        rpm, current, duty = parse_status(msg.data)
+        vesc_data[vesc_id]['current'] = current
+        vesc_data[vesc_id]['rpm'] = rpm
+        vesc_data[vesc_id]['duty'] = duty
+
+  
+    elif cmd == COMM_STATUS_2:  # STATUS_2
+        ah, ah_ch = parse_status_2(msg.data)
+        vesc_data[vesc_id]['amp_hours'] = ah
+        vesc_data[vesc_id]['amp_hours_charged'] = ah_ch
+        
+
+    elif cmd == COMM_STATUS_3:  # STATUS_3
+        wh, wh_ch = parse_status_3(msg.data)
+        vesc_data[vesc_id]['watt_hours'] = wh
+        vesc_data[vesc_id]['watt_hours_charged'] = wh_ch
+
+
+    elif cmd == COMM_STATUS_4:  # STATUS_4
+        mos, motor, input_i, pid = parse_status_4(msg.data)
+        vesc_data[vesc_id]['mos_temp'] = mos
+        vesc_data[vesc_id]['motor_temp'] = motor
+        vesc_data[vesc_id]['input_current'] = input_i
+        vesc_data[vesc_id]['pid_pos'] = pid
+
+
+    elif cmd == COMM_STATUS_5:  # STATUS_5
+        tach, voltage = parse_status_5(msg.data)
+        vesc_data[vesc_id]['tachometer'] = tach
+        vesc_data[vesc_id]['voltage'] = voltage
+
+
+
+ 
