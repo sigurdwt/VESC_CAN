@@ -1,0 +1,42 @@
+# --- Python bytecode / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Byggeartefakter (setuptools/wheel)
+build/
+dist/
+*.egg-info/
+*.egg
+
+# --- Virtuelle miljøer
+.venv/
+venv/
+ENV/
+env/
+
+# --- Test/QA verktøy
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.pytype/
+.ruff_cache/
+.tox/
+.nox/
+
+# --- Editor/IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# --- OS-spesifikt
+.DS_Store
+Thumbs.db
+
+# --- Notebooks
+.ipynb_checkpoints/
+
+# --- Misc
+*.log
