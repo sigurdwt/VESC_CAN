@@ -4,22 +4,13 @@ import struct
 import can
 import time
 
-
-COMM_SET_DUTY = 0x00
-COMM_SET_CURRENT = 0x01
-COMM_SET_BRAKE = 0x02
-COMM_SET_RPM = 0x03
-COMM_PING = 0x11
-
-COMM_STATUS_1 =  0x09
-COMM_STATUS_2 =  0x0E
-COMM_STATUS_3 =  0x0F
-COMM_STATUS_4 =  0x10
-COMM_STATUS_5 =  0x1B
-
-
 class VESC:
     # Kommando-koder (fra VESC firmware)
+    COMM_SET_DUTY = 0x00
+    COMM_SET_CURRENT = 0x01
+    COMM_SET_BRAKE = 0x02
+    COMM_SET_RPM = 0x03
+    COMM_PING = 0x11
 
 
 
@@ -141,6 +132,13 @@ def extract_command_and_id(arb_id):
 
 #Make a function thtat takes in a can msg and returns the correct data
 def parse_vesc_status(msg): 
+    COMM_STATUS_1 =  0x09
+    COMM_STATUS_2 =  0x0E
+    COMM_STATUS_3 =  0x0F
+    COMM_STATUS_4 =  0x10
+    COMM_STATUS_5 =  0x1B
+
+
     vesc_data = {
         vesc_id: {
             'time': None,
